@@ -12,10 +12,11 @@ router.get('/', (req, res) => {
     res.json({ account: "Hello World" })  // <==== req.body will be a parsed JSON object
 })
 
-router.post('/worker', async (req, res) => {
+router.get('/worker', async (req, res) => {
     const { account, DiffBagLand, last_mine_tx } = req.body
 	
-    const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);	
+    const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);
+    return res.status(200).send({ mined: mine_work })
 })
 
 const fromHexString = hexString =>
@@ -153,8 +154,7 @@ const setHash = async (mining_params) => {
         if (itr % 1 === 0) {
             console.log(`Still mining - tried ${itr} iterations`);
             const mine_work = { account: mining_params.account_str, rand_str: "0", hex_digest: "0" };
-            
-		return res.status(200).send({ mined: mine_work })
+            return mine_work;		
         }
 
         if (!good) {
