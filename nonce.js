@@ -42,7 +42,8 @@ router.get('/', (req, res) => {
 router.post('/worker', async (req, res) => {
     const { account, DiffBagLand, last_mine_tx } = req.body
     const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);
-    return res.status(200).send({ mined: mine_work })
+    res.json(mine_work)
+    //return res.status(200).send({ mined: mine_work })
 })
 
 const fromHexString = hexString =>
