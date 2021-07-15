@@ -2,30 +2,12 @@ const express = require('express')
 const axios = require('./axios')
 const bodyParser = require('body-parser')
 var cors = require("cors");
-const atomicassets_account = "atomicassets";
-const federation_account = "federation";
-const token_account = "alien.worlds";
-const collection = "alien.worlds";
-const endpoint = "https://wax.greymass.com"; //
-const atomic_endpoint = ['https://wax.api.atomicassets.io', 'https://wax3.api.atomicassets.io'];
 const { Api, JsonRpc, RpcError, Serialize } = require('eosjs');
-const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development only
-const fetch = require('node-fetch');                                    // node only; not needed in browsers
-const { ExplorerApi, RpcApi } = require("atomicassets");
-const eos_rpc = new JsonRpc(endpoint, { fetch });
-const aa_api = new ExplorerApi(atomic_endpoint[0], atomicassets_account, {
-    fetch,
-    rateLimit: 4,
-});
-
+const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development 
 const { TextDecoder, TextEncoder } = require(/*! text-encoding */ "text-encoding");
 const Int64LE = require(/*! int64-buffer */ "int64-buffer").Int64LE;
 const crypto = require("crypto");
-const Buffer = require('buffer').Buffer  // note: the trailing slash is important!
-const Blob = require('blob');
-
 const ac = require("@antiadmin/anticaptchaofficial");
-
 const router = express.Router()
 router.use(bodyParser.urlencoded({ extended: false }));
 router.use(bodyParser.json())
