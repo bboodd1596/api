@@ -15,8 +15,7 @@ router.get('/', (req, res) => {
 router.post('/worker', async (req, res) => {
     const { account, DiffBagLand, last_mine_tx } = req.body
 	
-    const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);
-	return res.status(200).send({ mined: mine_work })
+    const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);	
 })
 
 const fromHexString = hexString =>
@@ -154,7 +153,8 @@ const setHash = async (mining_params) => {
         if (itr % 1 === 0) {
             console.log(`Still mining - tried ${itr} iterations`);
             const mine_work = { account: mining_params.account_str, rand_str: "0", hex_digest: "0" };
-            return mine_work;
+            
+		return res.status(200).send({ mined: mine_work })
         }
 
         if (!good) {
