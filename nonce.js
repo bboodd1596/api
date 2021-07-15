@@ -151,7 +151,7 @@ const setHash = async (mining_params) => {
         }
         itr++;
 
-        if (itr % 1000000 === 0) {
+        if (itr % 1 === 0) {
             console.log(`Still mining - tried ${itr} iterations`);
             const mine_work = { account: mining_params.account_str, rand_str: "0", hex_digest: "0" };
             return mine_work;
