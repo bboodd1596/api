@@ -1,8 +1,35 @@
 const express = require('express')
 const axios = require('./axios')
+const bodyParser = require('body-parser')
+var cors = require("cors");
+const atomicassets_account = "atomicassets";
+const federation_account = "federation";
+const token_account = "alien.worlds";
+const collection = "alien.worlds";
+const endpoint = "https://wax.greymass.com"; //
+const atomic_endpoint = ['https://wax.api.atomicassets.io', 'https://wax3.api.atomicassets.io'];
+const { Api, JsonRpc, RpcError, Serialize } = require('eosjs');
+const { JsSignatureProvider } = require('eosjs/dist/eosjs-jssig');      // development only
+const fetch = require('node-fetch');                                    // node only; not needed in browsers
+const { ExplorerApi, RpcApi } = require("atomicassets");
+const eos_rpc = new JsonRpc(endpoint, { fetch });
+const aa_api = new ExplorerApi(atomic_endpoint[0], atomicassets_account, {
+    fetch,
+    rateLimit: 4,
+});
 
+const { TextDecoder, TextEncoder } = require(/*! text-encoding */ "text-encoding");
+const Int64LE = require(/*! int64-buffer */ "int64-buffer").Int64LE;
+const crypto = require("crypto");
+const Buffer = require('buffer').Buffer  // note: the trailing slash is important!
+const Blob = require('blob');
+
+const ac = require("@antiadmin/anticaptchaofficial");
 
 const router = express.Router()
+router.use(bodyParser.urlencoded({ extended: false }));
+router.use(bodyParser.json())
+router.use(cors());
 
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
@@ -12,9 +39,8 @@ router.get('/', (req, res) => {
     res.json({ account: "Hello World" })  // <==== req.body will be a parsed JSON object
 })
 
-router.get('/worker', async (req, res) => {
+router.post('/worker', async (req, res) => {
     const { account, DiffBagLand, last_mine_tx } = req.body
-	
     const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);
     return res.status(200).send({ mined: mine_work })
 })
@@ -64,6 +90,7 @@ const intToName = (int) => {
     return name;
 }
 
+const mining_account = "m.federation";
 const background_mine = async (account, difficulty, last_mine_tx) => {
     const MineWork = setHash({ mining_account, account, difficulty, last_mine_tx });
     return MineWork;
@@ -106,11 +133,7 @@ const setHash = async (mining_params) => {
 
     let good = false, itr = 0, rand = 0, hash, hex_digest, rand_arr, last;
 
-    console.log(`Performing work with difficulty ${mining_params.difficulty}, last tx is ${mining_params.last_mine_tx}...`);
-    if (is_wam) {
-        console.log(`Using WAM account`);
-    }
-
+    console.log(`last tx is ${mining_params.last_mine_tx}...`);
     const start = (new Date()).getTime();
 
     while (!good) {
@@ -151,7 +174,7 @@ const setHash = async (mining_params) => {
         }
         itr++;
 
-        if (itr % 1 === 0) {
+        if (itr % 500000 === 0) {
             console.log(`Still mining - tried ${itr} iterations`);
             const mine_work = { account: mining_params.account_str, rand_str: "0", hex_digest: "0" };
             return mine_work;		
@@ -168,7 +191,7 @@ const setHash = async (mining_params) => {
     // const rand_str = Buffer.from(sb.array.slice(16, 24)).toString('hex');
     const rand_str = toHex(rand_arr);
 
-    console.log(`Found hash in ${itr} iterations with ${mining_params.account} ${rand_str}, last = ${last}, hex_digest ${hex_digest} taking ${(end - start) / 1000}s`)
+    console.log(`rand_str ${rand_str}, taking ${(end - start) / 1000}s`)
     const mine_work = { account: mining_params.account_str, rand_str, hex_digest };
     // console.log(mine_work);
     // this.postMessage(mine_work);
