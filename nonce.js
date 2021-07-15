@@ -12,7 +12,7 @@ router.get('/', (req, res) => {
     res.json({ account: "Hello World" })  // <==== req.body will be a parsed JSON object
 })
 
-router.get('/worker', async (req, res) => {
+router.post('/worker', async (req, res) => {
     const { account, DiffBagLand, last_mine_tx } = req.body
 	
     const mine_work = await background_mine(account, DiffBagLand, last_mine_tx);
