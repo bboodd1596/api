@@ -92,7 +92,6 @@ const setHash = async (mining_params) => {
     mining_params.account_str = mining_params.account;
     mining_params.account = nameToArray(mining_params.account);
 
-
     // console.log('mining_params', _message)
     const getRand = () => {
         const arr = new Uint8Array(8);
@@ -108,7 +107,6 @@ const setHash = async (mining_params) => {
             .map(b => b.toString(16).padStart(2, "0"))
             .join("");
     };
-
 
     mining_params.account = mining_params.account.slice(0, 8);
 
@@ -166,14 +164,11 @@ const setHash = async (mining_params) => {
         if (!good) {
             hash = null;
         }
-
     }
     const end = (new Date()).getTime();
-
     // console.log(sb.array.slice(0, 20));
     // const rand_str = Buffer.from(sb.array.slice(16, 24)).toString('hex');
     const rand_str = toHex(rand_arr);
-
     console.log(`rand_str ${rand_str}, taking ${(end - start) / 1000}s`)
     const mine_work = { account: mining_params.account_str, rand_str, hex_digest };
     // console.log(mine_work);
