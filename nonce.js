@@ -16,6 +16,7 @@ router.use(cors());
 function getRandom(min, max) {
     return Math.floor(Math.random() * (max - min) + min);
 }
+
 router.get('/', (req, res) => {
     res.json({ account: "Hello World" })  // <==== req.body will be a parsed JSON object
 })
